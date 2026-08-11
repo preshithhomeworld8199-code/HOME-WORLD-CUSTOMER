@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home World - Quotation</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eee;font-family:Arial,Helvetica,sans-serif;color:#111}
+.page{width:210mm;min-height:297mm;margin:20px auto;padding:8mm 10mm;background:#fff;box-shadow:0 3px 18px rgba(0,0,0,.18)}
+.brand{text-align:center}
+.logo{width:24mm;height:20mm;display:block;margin:0 auto 1mm}
+.brand-name{margin:0;color:#99004f;font-size:24px;font-weight:700;letter-spacing:.5px}
+.tagline{margin-top:2px;color:#99004f;font-size:14px;font-weight:700}
+.date-row{text-align:right;margin:9px 30mm 12px 0;font-size:15px}
+.date-row input{border:0;border-bottom:1px solid #777;outline:0;font-size:15px}
+.title{margin:0 0 12px;text-align:center;font-family:"Courier New",monospace;font-size:29px}
+.customer-table,.quote-table{border-collapse:collapse}
+.customer-table{width:88%;margin:0 auto 13px;table-layout:fixed;border:2px solid #111}
+.customer-table th{height:32px;padding:6px;background:#171717;color:#e5c63f;font-weight:400;border-right:2px solid #111}
+.customer-table td{height:45px;padding:0;border-top:2px solid #111;border-right:2px solid #111}
+.customer-table input{width:100%;height:100%;padding:8px;border:0;outline:0;font-size:14px}
+.quote-table{width:94%;margin:0 auto;table-layout:fixed;border:2px solid #111}
+.quote-table th,.quote-table td{border:2px solid #111}
+.quote-table th{height:30px;padding:5px;background:#171717;color:#e5c63f;font-size:14px;font-weight:400}
+.quote-table td{height:30px;padding:2px 4px}
+.quote-table th:nth-child(1){width:7%}
+.quote-table th:nth-child(2){width:51%}
+.quote-table th:nth-child(3){width:13%}
+.quote-table th:nth-child(4){width:14%}
+.quote-table th:nth-child(5){width:15%}
+.quote-table input,.quote-table textarea{width:100%;border:0;outline:0;background:transparent;font-family:Arial,Helvetica,sans-serif;font-size:12px}
+.quote-table input{text-align:right}
+.quote-table .serial{text-align:center}
+.quote-table textarea{display:block;min-height:23px;resize:vertical;line-height:18px}
+.bottom-section{width:90%;margin:10px auto 0;display:grid;grid-template-columns:63% 37%;gap:12px}
+.materials h3{margin:0 0 15px;font-size:14px}
+.materials p{margin:0 0 12px;font-size:10.5px;line-height:1.35;text-transform:uppercase}
+.summary{padding-left:5px;font-size:18px;font-weight:700}
+.summary-row{display:flex;justify-content:space-between;align-items:center;min-height:34px}
+.summary-value{min-width:70px;text-align:right}
+.summary input{width:75px;border:0;outline:0;text-align:right;font-size:18px;font-weight:600}
+.validity{margin-top:22px;text-align:center;font-size:14px;font-weight:700;text-transform:uppercase}
+.actions{position:fixed;top:15px;right:15px;display:flex;gap:7px;z-index:10}
+.actions button{border:0;border-radius:5px;padding:9px 12px;background:#171717;color:#fff;cursor:pointer;font-weight:700}
+.actions button:hover{opacity:.85}
+@media(max-width:800px){
+ .page{width:100%;min-height:auto;margin:0;padding:20px 10px;box-shadow:none}
+ .customer-table,.quote-table,.bottom-section{width:100%}
+ .bottom-section{grid-template-columns:1fr}
+ .date-row{margin-right:0}
+}
+@media print{
+ html,body{background:#fff}
+ .page{width:210mm;min-height:297mm;margin:0;padding:8mm 10mm;box-shadow:none}
+ .actions{display:none}
+ @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+
+<div class="actions">
+  <button type="button" id="addRowButton">+ Add Row</button>
+  <button type="button" id="printButton">Print / Save PDF</button>
+</div>
+
+<main class="page">
+<header class="brand">
+  <!-- Small logo with transparent background -->
+  <svg class="logo" viewBox="0 0 180 150" aria-label="Home World Logo">
+    <g fill="none" stroke="#99004f" stroke-width="7" stroke-linejoin="round">
+      <path d="M35 72 L90 25 L145 72"/>
+      <path d="M48 67 V120 H132 V67"/>
+    </g>
+    <circle cx="90" cy="75" r="24" fill="#e5c63f"/>
+    <path d="M76 75h28M90 61v28" stroke="#99004f" stroke-width="6"/>
+  </svg>
+  <h1 class="brand-name">HOME WORLD</h1>
+  <div class="tagline">POLLACHI’S INTERIOR DESTINATION FOR DREAM SPACES</div>
+</header>
+
+<div class="date-row">
+  Date : <input id="quotationDate" type="date" aria-label="Quotation date">
+</div>
+
+<h2 class="title">Quotation</h2>
+
+<table class="customer-table">
+<thead><tr><th>Customer</th><th>Site</th></tr></thead>
+<tbody><tr>
+<td><input id="customerName" type="text" aria-label="Customer name"></td>
+<td><input id="customerSite" type="text" aria-label="Customer site"></td>
+</tr></tbody>
+</table>
+
+<table class="quote-table" id="quoteTable">
+<thead>
+<tr>
+  <th>S.No</th>
+  <th>Description</th>
+  <th>Qty</th>
+  <th>Rate</th>
+  <th>Amount</th>
+</tr>
+</thead>
+<tbody id="quoteBody"></tbody>
+</table>
+
+<section class="bottom-section">
+<div class="materials">
+<h3>MATERIAL TO BE USED</h3>
+<p>IN WARDROBE AND STORE ROOM COMMERCIAL PLYWOOD WITH BACKSIDE FABRIC LAMINATE AND FRONT SIDE LAMINATE OF YOUR CHOICE, FEVICOL HYPER FOR PASTING THE LAMINATE, HANDLE, LOCK AND ALL OTHER FITTINGS INCLUDED HINGES HETTICH WILL BE USED.</p>
+<p>IN KITCHEN WATERPROOF PLYWOOD WILL BE USED HINGES HETTICH WILL BE USED AND ALL FITTING WILL BE DONE.</p>
+<p>ABOVE THE AMOUNT GST WILL BE EXTRA</p>
+</div>
+
+<div class="summary">
+<div class="summary-row"><span>Subtotal</span><span class="summary-value" id="subtotal">-</span></div>
+<div class="summary-row"><span>Discount</span><span class="summary-value"><input id="discount" type="number" min="0" step="0.01" value="0"></span></div>
+<div class="summary-row"><span>Taxes</span><span class="summary-value"><input id="taxes" type="number" min="0" step="0.01" value="0"></span></div>
+<div class="summary-row"><span>Total</span><span class="summary-value" id="total">-</span></div>
+</div>
+</section>
+
+<div class="validity">THE QUOTATION WILL BE VALID FOR 2 WEEKS ONLY FROM THE ABOVE DATE</div>
+</main>
+
+<script>
+(function(){
+"use strict";
+const body=document.getElementById("quoteBody");
+const discount=document.getElementById("discount");
+const taxes=document.getElementById("taxes");
+const subtotal=document.getElementById("subtotal");
+const total=document.getElementById("total");
+
+function money(n){return n.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+function calculate(){
+ let sub=0;
+ body.querySelectorAll("tr").forEach(row=>{
+   const qty=parseFloat(row.querySelector(".qty").value)||0;
+   const rate=parseFloat(row.querySelector(".rate").value)||0;
+   const amount=qty*rate;
+   row.querySelector(".amount").value=amount>0?money(amount):"";
+   sub+=amount;
+ });
+ const d=parseFloat(discount.value)||0;
+ const t=parseFloat(taxes.value)||0;
+ const grand=sub-d+t;
+ subtotal.textContent=sub>0?money(sub):"-";
+ total.textContent=grand!==0?money(grand):"-";
+}
+
+function addRow(){
+ const row=document.createElement("tr");
+ row.innerHTML=`
+ <td><input class="serial" type="text" readonly></td>
+ <td><textarea class="description" rows="1"></textarea></td>
+ <td><input class="qty" type="number" min="0" step="0.01"></td>
+ <td><input class="rate" type="number" min="0" step="0.01"></td>
+ <td><input class="amount" type="text" readonly></td>`;
+ row.querySelector(".qty").addEventListener("input",calculate);
+ row.querySelector(".rate").addEventListener("input",calculate);
+ body.appendChild(row);
+ [...body.rows].forEach((r,i)=>r.querySelector(".serial").value=i+1);
+ calculate();
+}
+
+document.getElementById("addRowButton").addEventListener("click",addRow);
+document.getElementById("printButton").addEventListener("click",()=>window.print());
+discount.addEventListener("input",calculate);
+taxes.addEventListener("input",calculate);
+document.getElementById("quotationDate").value=new Date().toISOString().slice(0,10);
+
+for(let i=0;i<5;i++) addRow();
+})();
+</script>
+</body>
+</html>
