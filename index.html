@@ -110,6 +110,7 @@ body{margin:0;background:#eee;font-family:Arial,Helvetica,sans-serif;color:#111}
 
 <div class="actions">
   <button type="button" id="addRowButton">+ Add Row</button>
+    <button type="button" id="removeRowButton">− Remove Row</button>
   <button type="button" id="printButton">Print / Save PDF</button>
 </div>
 
@@ -293,6 +294,18 @@ updateColumnWidths();
 calculate();
 
 })();
+
+    const removeRowButton = document.getElementById("removeRowButton");
+    if (removeRowButton) {
+        removeRowButton.addEventListener("click", function () {
+            const rows = quoteBody.querySelectorAll("tr");
+            if (rows.length > 1) {
+                quoteBody.removeChild(rows[rows.length - 1]);
+                renumberRows();
+                calculateTotals();
+            }
+        });
+    }
 </script>
 </body>
 </html>
