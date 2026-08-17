@@ -72,7 +72,26 @@ input,select,textarea{width:100%;padding:10px;border:1px solid #d7dde3;border-ra
 
 <script>
 const today=new Date().toISOString().slice(0,10);
-let customers=[];
+let customers=JSON.parse(localStorage.getItem('hwcrm')||'[]');
+let dataFileHandle=null;
+function updateFolderStatus(t){const e=document.getElementById('folderStatus');if(e)e.textContent=t}
+async function chooseFolder(){
+ if(!window.showDirectoryPicker){alert('Please use the latest Chrome or Edge.');return}
+ try{
+  const folder=await window.showDirectoryPicker({mode:'readwrite'});
+  dataFileHandle=await folder.getFileHandle('customers.json',{create:true});
+  const file=await dataFileHandle.getFile(); const text=await file.text();
+  if(text.trim()){try{const saved=JSON.parse(text);customers=Array.isArray(saved)?saved:[]}catch(e){customers=[]}}
+  else{customers=[];await writeCustomerFile()}
+  localStorage.setItem('hwcrm',JSON.stringify(customers));updateFolderStatus('D:\\Home World');render();
+  alert('D:\\Home World connected successfully.');
+ }catch(e){if(e.name!=='AbortError')alert('Could not connect the folder.')}
+}
+async function writeCustomerFile(){
+ if(!dataFileHandle)return true;
+ try{const w=await dataFileHandle.createWritable();await w.write(JSON.stringify(customers,null,2));await w.close();return true}catch(e){console.error(e);return false}
+}
+async function saveCustomerData(){localStorage.setItem('hwcrm',JSON.stringify(customers));return await writeCustomerFile()}
 let dataFileHandle=null;
 let folderHandle=null;
 
@@ -130,7 +149,5 @@ function renderQuotes(){document.getElementById('quoteTable').innerHTML=customer
 function renderReports(){let w=customers.filter(x=>x.status==='Won'),o=customers.filter(x=>x.date<today&&x.status!=='Won'&&x.status!=='Lost');document.getElementById('conversion').textContent=customers.length?Math.round(w.length/customers.length*100)+'%':'0%';document.getElementById('overdue').textContent=o.length;document.getElementById('pipeline').textContent='₹'+customers.filter(x=>!['Won','Lost'].includes(x.status)).reduce((a,x)=>a+Number(x.amount||0),0).toLocaleString('en-IN');document.getElementById('wonValue').textContent='₹'+w.reduce((a,x)=>a+Number(x.amount||0),0).toLocaleString('en-IN')}
 function openModal(){document.getElementById('modal').style.display='flex';document.getElementById('date').value=today}
 function closeModal(){document.getElementById('modal').style.display='none'}
-function add(){let name=document.getElementById('name').value.trim(),phone=document.getElementById('phone').value.trim();if(!name||!phone){alert('Enter customer name and phone.');return}customers.push({name,phone,req:document.getElementById('req').value,source:document.getElementById('source').value,status:document.getElementById('status').value,date:document.getElementById('date').value,amount:Number(document.getElementById('amount').value||0),person:document.getElementById('person').value,notes:document.getElementById('notes').value});save();closeModal();render();alert(dataFileHandle?'Customer saved to the selected D drive folder.':'Customer saved in browser storage. Set the D:\\Home World folder to save a file there.')}
-function update(i){let s=prompt('Enter status: New Lead, Contacted, Quotation, Follow-up, Won, Lost',customers[i].status);if(s&&['New Lead','Contacted','Quotation','Follow-up','Won','Lost'].includes(s)){customers[i].status=s;save();render()}}
-render();
+async function add(){let name=document.getElementById('name').value.trim(),phone=document.getElementById('phone').value.trim();if(!name||!phone){alert('Please enter Customer Name and Phone Number.');return}customers.push({id:Date.now(),name,phone,req:document.getElementById('req').value.trim(),source:document.getElementById('source').value.trim(),status:document.getElementById('status').value,date:document.getElementById('date').value||today,amount:Number(document.getElementById('amount').value||0),person:document.getElementById('person').value.trim(),notes:document.getElementById('notes').value.trim()});let ok=await saveCustomerData();if(!ok){customers.pop();localStorage.setItem('hwcrm',JSON.stringify(customers));alert('Could not save to D:\\Home World. Please reconnect the folder.');return}closeModal();document.querySelectorAll('#modal input,#modal textarea').forEach(x=>x.value='');document.getElementById('status').value='New Lead';render();alert(dataFileHandle?'Customer saved to D:\\Home World.':'Customer saved successfully.')}async function update(i){let s=prompt('Enter status: New Lead, Contacted, Quotation, Follow-up, Won, Lost',customers[i].status);if(s&&['New Lead','Contacted','Quotation','Follow-up','Won','Lost'].includes(s)){let old=customers[i].status;customers[i].status=s;let ok=await saveCustomerData();if(!ok)customers[i].status=old;render()}}render();
 </script></body></html>
